@@ -1,4 +1,6 @@
 import pandas as pd
+import matplotlib.pyplot as plt
+import seaborn as sns
 from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LogisticRegression
 from sklearn.ensemble import RandomForestClassifier
@@ -54,6 +56,40 @@ rf_matriz = confusion_matrix(Y_test, previsoes_rf)
 
 print(log_matriz)
 print(rf_matriz)
+
+def plotar_matriz(modelo, nome_modelo, X_teste, Y_teste): #função para plotar a matriz de confusão
+    # Faz as previsões
+    y_pred = modelo.predict(X_teste)
+    # Gera a matriz matemática
+    cm = confusion_matrix(Y_teste, y_pred)
+    
+    # Cria o desenho
+    plt.figure(figsize=(6, 5))
+    sns.heatmap(cm, annot=True, fmt='d', cmap='Blues', cbar=False)
+    plt.title(f'Matriz de Confusão: {nome_modelo}')
+    plt.xlabel('O que o Robô previu')
+    plt.ylabel('O que aconteceu de verdade')
+    plt.show()
+
+# Chamando a função para os dois modelos
+plotar_matriz(modelo_log, "Regressão Logística", X_test, Y_test)
+plotar_matriz(modelo_rf, "Random Forest", X_test, Y_test)
+
+
+
+plt.figure(figsize=(10, 6))
+importancias = modelo_rf.feature_importances_
+colunas = X.columns
+
+# Criando um DataFrame só para organizar o gráfico
+df_importancia = pd.DataFrame({'Variavel': colunas, 'Importancia': importancias})
+df_importancia = df_importancia.sort_values(by='Importancia', ascending=False)
+
+sns.barplot(x='Importancia', y='Variavel', data=df_importancia, palette='viridis')
+plt.title('O que mais causa Churn (Cancelamento)?')
+plt.xlabel('Peso da Importância')
+plt.ylabel('Variáveis')
+plt.show()
 
 print("Classificação log: \n", classification_report(Y_test, previsoes_log))
 print("Classificação rf: \n", classification_report(Y_test, previsoes_rf))
